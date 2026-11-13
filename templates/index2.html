@@ -1,0 +1,835 @@
+<!--<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pneumonia Detection By Vaibhav Sonar - Chest X-Ray Analysis</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 900px;
+            width: 100%;
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            overflow: hidden;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 40px 30px;
+            text-align: center;
+        }
+
+        .header h1 {
+            font-size: 32px;
+            margin-bottom: 10px;
+            font-weight: 700;
+        }
+
+        .header p {
+            font-size: 16px;
+            opacity: 0.95;
+            margin-bottom: 5px;
+        }
+
+        .header .subtitle {
+            font-size: 14px;
+            opacity: 0.85;
+            margin-top: 10px;
+        }
+
+        .content {
+            padding: 40px;
+        }
+
+        .model-status {
+            background: #f0f9ff;
+            border-left: 4px solid #667eea;
+            padding: 15px 20px;
+            margin-bottom: 30px;
+            border-radius: 8px;
+            font-size: 14px;
+        }
+
+        .model-status.warning {
+            background: #fff8e1;
+            border-left-color: #ffc107;
+        }
+
+        .model-status p {
+            margin: 5px 0;
+        }
+
+        .status-badge {
+            display: inline-block;
+            padding: 4px 12px;
+            border-radius: 12px;
+            font-weight: 600;
+            font-size: 12px;
+            margin-left: 10px;
+        }
+
+        .status-badge.ready {
+            background: #4caf50;
+            color: white;
+        }
+
+        .status-badge.warning {
+            background: #ffc107;
+            color: black;
+        }
+
+        .upload-section {
+            margin-bottom: 40px;
+        }
+
+        .upload-section h2 {
+            font-size: 20px;
+            margin-bottom: 20px;
+            color: #333;
+            font-weight: 600;
+        }
+
+        .upload-area {
+            border: 3px dashed #667eea;
+            border-radius: 12px;
+            padding: 40px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            background: #f8f9ff;
+        }
+
+        .upload-area:hover {
+            border-color: #764ba2;
+            background: #f0f2ff;
+        }
+
+        .upload-area.dragover {
+            border-color: #764ba2;
+            background: #e8ebf8;
+            transform: scale(1.02);
+        }
+
+        .upload-area-icon {
+            font-size: 48px;
+            margin-bottom: 15px;
+        }
+
+        .upload-area p {
+            color: #667eea;
+            font-weight: 600;
+            margin-bottom: 8px;
+        }
+
+        .upload-area .or {
+            color: #999;
+            font-size: 13px;
+            margin: 15px 0;
+        }
+
+        .upload-btn {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            padding: 12px 30px;
+            border-radius: 25px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 600;
+            transition: transform 0.2s, box-shadow 0.2s;
+            margin-top: 10px;
+        }
+
+        .upload-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 25px rgba(102, 126, 234, 0.4);
+        }
+
+        .upload-btn:active {
+            transform: translateY(0);
+        }
+
+        .upload-btn.loading {
+            opacity: 0.7;
+            cursor: not-allowed;
+        }
+
+        #fileInput {
+            display: none;
+        }
+
+        .preview-section {
+            margin-bottom: 30px;
+            display: none;
+        }
+
+        .preview-section.show {
+            display: block;
+        }
+
+        .preview-section h2 {
+            font-size: 20px;
+            margin-bottom: 20px;
+            color: #333;
+            font-weight: 600;
+        }
+
+        .preview-container {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 30px;
+            margin-bottom: 30px;
+        }
+
+        @media (max-width: 600px) {
+            .preview-container {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .preview-image {
+            text-align: center;
+        }
+
+        .preview-image img {
+            max-width: 100%;
+            max-height: 350px;
+            border-radius: 12px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        .preview-image p {
+            color: #666;
+            font-size: 14px;
+            margin-top: 10px;
+        }
+
+        .results-section {
+            display: none;
+            animation: slideIn 0.5s ease;
+        }
+
+        .results-section.show {
+            display: block;
+        }
+
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .results-section h2 {
+            font-size: 20px;
+            margin-bottom: 20px;
+            color: #333;
+            font-weight: 600;
+        }
+
+        .prediction-result {
+            background: white;
+            border-radius: 12px;
+            padding: 30px;
+            border: 2px solid #e0e0e0;
+            margin-bottom: 20px;
+        }
+
+        .prediction-result.pneumonia {
+            border-color: #f44336;
+            background: #ffebee;
+        }
+
+        .prediction-result.normal {
+            border-color: #4caf50;
+            background: #f1f8e9;
+        }
+
+        .prediction-header {
+            display: flex;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .prediction-icon {
+            font-size: 40px;
+            margin-right: 20px;
+        }
+
+        .prediction-text h3 {
+            font-size: 24px;
+            margin-bottom: 5px;
+        }
+
+        .prediction-text p {
+            font-size: 14px;
+            color: #666;
+        }
+
+        .confidence-section {
+            margin-top: 20px;
+        }
+
+        .confidence-section h4 {
+            font-size: 14px;
+            color: #666;
+            margin-bottom: 10px;
+            font-weight: 600;
+        }
+
+        .confidence-bars {
+            display: grid;
+            gap: 15px;
+        }
+
+        .confidence-bar {
+            display: grid;
+            grid-template-columns: 80px 1fr 60px;
+            gap: 15px;
+            align-items: center;
+        }
+
+        .confidence-label {
+            font-weight: 600;
+            font-size: 13px;
+            color: #333;
+        }
+
+        .progress-bar {
+            background: #e0e0e0;
+            border-radius: 10px;
+            height: 10px;
+            overflow: hidden;
+        }
+
+        .progress-fill {
+            height: 100%;
+            border-radius: 10px;
+            transition: width 0.6s ease;
+            background: linear-gradient(90deg, #667eea, #764ba2);
+        }
+
+        .progress-value {
+            text-align: right;
+            font-weight: 700;
+            font-size: 14px;
+            color: #667eea;
+        }
+
+        .confidence-section .normal .progress-fill {
+            background: linear-gradient(90deg, #4caf50, #66bb6a);
+        }
+
+        .confidence-section .normal .progress-value {
+            color: #4caf50;
+        }
+
+        .confidence-section .pneumonia .progress-fill {
+            background: linear-gradient(90deg, #f44336, #ef5350);
+        }
+
+        .confidence-section .pneumonia .progress-value {
+            color: #f44336;
+        }
+
+        .details-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+            margin-top: 20px;
+            padding-top: 20px;
+            border-top: 1px solid rgba(0, 0, 0, 0.1);
+        }
+
+        @media (max-width: 600px) {
+            .details-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .detail-item {
+            padding: 12px;
+            background: rgba(102, 126, 234, 0.05);
+            border-radius: 8px;
+        }
+
+        .detail-label {
+            font-size: 12px;
+            color: #666;
+            margin-bottom: 5px;
+            font-weight: 600;
+        }
+
+        .detail-value {
+            font-size: 16px;
+            color: #333;
+            font-weight: 700;
+        }
+
+        .actions {
+            display: flex;
+            gap: 10px;
+            margin-top: 20px;
+        }
+
+        .btn-secondary {
+            background: #f0f0f0;
+            color: #333;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 20px;
+            cursor: pointer;
+            font-size: 13px;
+            font-weight: 600;
+            transition: all 0.2s;
+            flex: 1;
+        }
+
+        .btn-secondary:hover {
+            background: #e0e0e0;
+            transform: translateY(-1px);
+        }
+
+        .error-message {
+            background: #ffebee;
+            border: 1px solid #f44336;
+            color: #c62828;
+            padding: 15px 20px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            display: none;
+        }
+
+        .error-message.show {
+            display: block;
+        }
+
+        .loading-spinner {
+            display: none;
+            text-align: center;
+            padding: 30px;
+        }
+
+        .loading-spinner.show {
+            display: block;
+        }
+
+        .spinner {
+            border: 4px solid #f0f0f0;
+            border-top: 4px solid #667eea;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 15px;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .footer {
+            background: #f8f9fa;
+            padding: 20px 40px;
+            text-align: center;
+            color: #666;
+            font-size: 13px;
+            border-top: 1px solid #e0e0e0;
+        }
+
+        .footer a {
+            color: #667eea;
+            text-decoration: none;
+        }
+
+        .footer a:hover {
+            text-decoration: underline;
+        }
+
+        .medical-disclaimer {
+            background: #fff3e0;
+            border-left: 4px solid #ff9800;
+            padding: 15px 20px;
+            margin-top: 20px;
+            border-radius: 8px;
+            font-size: 13px;
+            color: #e65100;
+        }
+
+        .medical-disclaimer strong {
+            display: block;
+            margin-bottom: 5px;
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 40px 20px;
+            color: #999;
+        }
+
+        .empty-state-icon {
+            font-size: 64px;
+            margin-bottom: 20px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Header -->
+        <div class="header">
+            <h1>🫁 Pneumonia Detection BY Vaibhav Sonar</h1>
+            <p>AI-Powered Chest X-Ray Analysis</p>
+            <p class="subtitle">Using Deep Learning & Transfer Learning (ResNet50)</p>
+        </div>
+
+        <!-- Content -->
+        <div class="content">
+            <!-- Model Status -->
+            <div class="model-status" id="modelStatus">
+                <p>
+                    Model Status:
+                    <span class="status-badge ready" id="modelBadge">READY</span>
+                </p>
+                <p id="statusText">Model loaded successfully and ready for predictions.</p>
+            </div>
+
+            <!-- Error Message -->
+            <div class="error-message" id="errorMessage"></div>
+
+            <!-- Upload Section -->
+            <div class="upload-section">
+                <h2>Upload Chest X-Ray Image</h2>
+                <div class="upload-area" id="uploadArea">
+                    <div class="upload-area-icon">📁</div>
+                    <p>Drag and drop your image here</p>
+                    <div class="or">or</div>
+                    <button class="upload-btn" id="browseBtn">Browse Files</button>
+                    <p style="font-size: 12px; color: #999; margin-top: 10px;">
+                        Supported formats: PNG, JPG, JPEG (Max 16MB)
+                    </p>
+                </div>
+                <input type="file" id="fileInput" accept=".png,.jpg,.jpeg" />
+            </div>
+
+            <!-- Loading Spinner -->
+            <div class="loading-spinner" id="loadingSpinner">
+                <div class="spinner"></div>
+                <p>Analyzing image...</p>
+            </div>
+
+            <!-- Preview Section -->
+            <div class="preview-section" id="previewSection">
+                <h2>Preview</h2>
+                <div class="preview-container">
+                    <div class="preview-image">
+                        <img id="previewImage" src="" alt="Preview">
+                        <p>Uploaded Image</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Results Section -->
+            <div class="results-section" id="resultsSection">
+                <h2>Analysis Results</h2>
+                <div id="resultsContainer"></div>
+
+                <!-- Medical Disclaimer -->
+                <div class="medical-disclaimer">
+                    <strong>⚠️ Medical Disclaimer</strong>
+                    This tool is for educational and research purposes only. It should not be used for clinical diagnosis. 
+                    Always consult with qualified medical professionals for proper diagnosis and treatment.
+                </div>
+
+                <!-- Actions -->
+                <div class="actions">
+                    <button class="btn-secondary" onclick="resetApp()">Upload Another Image</button>
+                </div>
+            </div>
+
+            <!-- Empty State -->
+            <div class="empty-state" id="emptyState" style="display: block;">
+                <div class="empty-state-icon">📸</div>
+                <p>Upload a chest X-ray image to begin analysis</p>
+            </div>
+        </div>
+
+        <!-- Footer -->
+        <div class="footer">
+            <p>🏥 Pneumonia Detection System | Powered by AI & Deep Learning</p>
+            <p style="margin-top: 8px; font-size: 12px;">
+                ResNet50 Transfer Learning Model | Accuracy: ~95% | ROC-AUC: ~99%
+            </p>
+        </div>
+    </div>
+
+    <script>
+        // ============================================================================
+        // Configuration
+        // ============================================================================
+
+        const API_ENDPOINTS = {
+            PREDICT: '/predict',
+            HEALTH: '/health',
+            MODEL_INFO: '/model-info'
+        };
+
+        const CLASSES = {
+            0: 'NORMAL',
+            1: 'PNEUMONIA'
+        };
+
+        const CLASS_ICONS = {
+            0: '✓',
+            1: '⚠️'
+        };
+
+        const CLASS_COLORS = {
+            0: 'normal',
+            1: 'pneumonia'
+        };
+
+        // ============================================================================
+        // DOM Elements
+        // ============================================================================
+
+        const uploadArea = document.getElementById('uploadArea');
+        const fileInput = document.getElementById('fileInput');
+        const browseBtn = document.getElementById('browseBtn');
+        const previewSection = document.getElementById('previewSection');
+        const previewImage = document.getElementById('previewImage');
+        const resultsSection = document.getElementById('resultsSection');
+        const resultsContainer = document.getElementById('resultsContainer');
+        const loadingSpinner = document.getElementById('loadingSpinner');
+        const errorMessage = document.getElementById('errorMessage');
+        const modelStatus = document.getElementById('modelStatus');
+        const emptyState = document.getElementById('emptyState');
+
+        // ============================================================================
+        // Event Listeners
+        // ============================================================================
+
+        browseBtn.addEventListener('click', () => {
+            fileInput.click();
+        });
+
+        fileInput.addEventListener('change', (e) => {
+            const file = e.target.files[0];
+            if (file) {
+                handleFile(file);
+            }
+        });
+
+        uploadArea.addEventListener('dragover', (e) => {
+            e.preventDefault();
+            uploadArea.classList.add('dragover');
+        });
+
+        uploadArea.addEventListener('dragleave', () => {
+            uploadArea.classList.remove('dragover');
+        });
+
+        uploadArea.addEventListener('drop', (e) => {
+            e.preventDefault();
+            uploadArea.classList.remove('dragover');
+            const file = e.dataTransfer.files[0];
+            if (file) {
+                handleFile(file);
+            }
+        });
+
+        // ============================================================================
+        // Functions
+        // ============================================================================
+
+        function handleFile(file) {
+            // Validate file
+            if (!['image/png', 'image/jpeg'].includes(file.type)) {
+                showError('Invalid file type. Only PNG and JPEG are supported.');
+                return;
+            }
+
+            if (file.size > 16 * 1024 * 1024) {
+                showError('File is too large. Maximum size is 16MB.');
+                return;
+            }
+
+            // Show preview
+            const reader = new FileReader();
+            reader.onload = (e) => {
+                previewImage.src = e.target.result;
+                previewSection.classList.add('show');
+                emptyState.style.display = 'none';
+                
+                // Make prediction
+                makePrediction(file);
+            };
+            reader.readAsDataURL(file);
+        }
+
+        function makePrediction(file) {
+            // Show loading
+            loadingSpinner.classList.add('show');
+            resultsSection.classList.remove('show');
+            clearError();
+
+            // Prepare form data
+            const formData = new FormData();
+            formData.append('file', file);
+
+            // Make request
+            fetch(API_ENDPOINTS.PREDICT, {
+                method: 'POST',
+                body: formData
+            })
+            .then(response => response.json())
+            .then(data => {
+                loadingSpinner.classList.remove('show');
+                
+                if (data.success) {
+                    displayResults(data);
+                } else {
+                    showError(data.error || 'Failed to make prediction.');
+                }
+            })
+            .catch(error => {
+                loadingSpinner.classList.remove('show');
+                showError('Connection error: ' + error.message);
+            });
+        }
+
+        function displayResults(prediction) {
+            const classIndex = prediction.class_index;
+            const className = CLASSES[classIndex];
+            const icon = CLASS_ICONS[classIndex];
+            const colorClass = CLASS_COLORS[classIndex];
+            const confidence = (prediction.confidence * 100).toFixed(2);
+            const normalConf = (prediction.normal_confidence * 100).toFixed(2);
+            const pneumoniaConf = (prediction.pneumonia_confidence * 100).toFixed(2);
+
+            // Create result HTML
+            const resultHTML = `
+                <div class="prediction-result ${colorClass}">
+                    <div class="prediction-header">
+                        <div class="prediction-icon">${icon}</div>
+                        <div class="prediction-text">
+                            <h3>${className}</h3>
+                            <p>Confidence: <strong>${confidence}%</strong></p>
+                        </div>
+                    </div>
+
+                    <div class="confidence-section">
+                        <h4>Confidence Breakdown:</h4>
+                        <div class="confidence-bars">
+                            <div class="confidence-bar normal">
+                                <div class="confidence-label">Normal</div>
+                                <div class="progress-bar">
+                                    <div class="progress-fill" style="width: ${normalConf}%"></div>
+                                </div>
+                                <div class="progress-value">${normalConf}%</div>
+                            </div>
+                            <div class="confidence-bar pneumonia">
+                                <div class="confidence-label">Pneumonia</div>
+                                <div class="progress-bar">
+                                    <div class="progress-fill" style="width: ${pneumoniaConf}%"></div>
+                                </div>
+                                <div class="progress-value">${pneumoniaConf}%</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="details-grid">
+                        <div class="detail-item">
+                            <div class="detail-label">Prediction</div>
+                            <div class="detail-value">${className}</div>
+                        </div>
+                        <div class="detail-item">
+                            <div class="detail-label">Confidence</div>
+                            <div class="detail-value">${confidence}%</div>
+                        </div>
+                        <div class="detail-item">
+                            <div class="detail-label">Model</div>
+                            <div class="detail-value">ResNet50</div>
+                        </div>
+                        <div class="detail-item">
+                            <div class="detail-label">Timestamp</div>
+                            <div class="detail-value">${new Date().toLocaleTimeString()}</div>
+                        </div>
+                    </div>
+                </div>
+            `;
+
+            resultsContainer.innerHTML = resultHTML;
+            resultsSection.classList.add('show');
+        }
+
+        function resetApp() {
+            // Reset UI
+            fileInput.value = '';
+            previewSection.classList.remove('show');
+            resultsSection.classList.remove('show');
+            loadingSpinner.classList.remove('show');
+            clearError();
+            emptyState.style.display = 'block';
+            
+            // Focus on upload area
+            uploadArea.focus();
+        }
+
+        function showError(message) {
+            errorMessage.textContent = message;
+            errorMessage.classList.add('show');
+        }
+
+        function clearError() {
+            errorMessage.classList.remove('show');
+            errorMessage.textContent = '';
+        }
+
+        // ============================================================================
+        // Initialization
+        // ============================================================================
+
+        window.addEventListener('load', () => {
+            // Check model status
+            fetch(API_ENDPOINTS.HEALTH)
+                .then(response => response.json())
+                .then(data => {
+                    if (!data.model_loaded) {
+                        modelStatus.classList.add('warning');
+                        document.getElementById('modelBadge').textContent = 'WARNING';
+                        document.getElementById('modelBadge').classList.remove('ready');
+                        document.getElementById('statusText').innerHTML = 
+                            '⚠️ Model weights not found. Using untrained model for demonstration. ' +
+                            'For accurate predictions, please train and save the model first.';
+                    }
+                })
+                .catch(error => {
+                    console.error('Health check failed:', error);
+                });
+        });
+    </script>
+</body>
+</html>

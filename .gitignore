@@ -1,0 +1,28 @@
+# Virtual Environment (Windows & Linux)
+venv/
+env/
+ENV/
+.venv/
+
+# Large Datasets (Do not push to GitHub)
+chest_xray/
+
+# Uploaded Images
+uploads/*
+!uploads/.gitkeep
+
+# Python cache & artifacts
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.pytest_cache/
+
+# Jupyter Notebook checkpoints
+.ipynb_checkpoints/
+
+# OS-generated files
+.DS_Store
+Thumbs.db
+desktop.ini
+

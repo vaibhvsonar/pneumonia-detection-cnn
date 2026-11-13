@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pneumonia Detection By Vaibhav Sonar - Chest X-Ray Analysis</title>
+
+    <!-- External CSS -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
+</head>
+<body>
+    <div class="container">
+        <!-- Header -->
+        <div class="header">
+            <h1>🫁 Pneumonia Detection BY <div class="cl">Vaibhav Sonar.</div></h1>
+            <p>AI-Powered Chest X-Ray Analysis</p>
+            <p class="subtitle">Using Deep Learning & Transfer Learning (ResNet50)</p>
+        </div>
+
+        <!-- Content -->
+        <div class="content">
+            <!-- Model Status -->
+            <div class="model-status" id="modelStatus">
+                <p>
+                    Model Status:
+                    <span class="status-badge ready" id="modelBadge">READY</span>
+                </p>
+                <p id="statusText">Model loaded successfully and ready for predictions.</p>
+            </div>
+
+            <!-- Error Message -->
+            <div class="error-message" id="errorMessage"></div>
+
+            <!-- Upload Section -->
+            <div class="upload-section">
+                <h2>Upload Chest X-Ray Image</h2>
+
+                <div class="upload-area" id="uploadArea">
+                    <div class="upload-area-icon">📁</div>
+                    <p>Drag and drop your image here</p>
+
+                    <div class="or">or</div>
+
+                    <button class="upload-btn" id="browseBtn">Browse Files</button>
+
+                    <p style="font-size: 12px; color: #999; margin-top: 10px;">
+                        Supported formats: PNG, JPG, JPEG (Max 16MB)
+                    </p>
+                </div>
+
+                <input type="file" id="fileInput" accept=".png,.jpg,.jpeg" />
+            </div>
+
+            <!-- Loading Spinner -->
+            <div class="loading-spinner" id="loadingSpinner">
+                <div class="spinner"></div>
+                <p>Analyzing image...</p>
+            </div>
+
+            <!-- Preview Section -->
+            <div class="preview-section" id="previewSection">
+                <h2>Preview</h2>
+
+                <div class="preview-container">
+                    <div class="preview-image">
+                        <img id="previewImage" src="" alt="Preview">
+                        <p>Uploaded Image</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Results Section -->
+            <div class="results-section" id="resultsSection">
+                <h2>Analysis Results</h2>
+
+                <div id="resultsContainer"></div>
+
+                <!-- Medical Disclaimer -->
+                <div class="medical-disclaimer">
+                    <strong>⚠️ Medical Disclaimer</strong>
+                    This tool is for educational and research purposes only.
+                    It should not be used for clinical diagnosis.
+                    Always consult with qualified medical professionals.
+                </div>
+
+                <!-- Actions -->
+                <div class="actions">
+                    <button class="btn-secondary" onclick="resetApp()">
+                        Upload Another Image
+                    </button>
+                </div>
+            </div>
+
+            <!-- Empty State -->
+            <div class="empty-state" id="emptyState" style="display: block;">
+                <div class="empty-state-icon">📸</div>
+                <p>Upload a chest X-ray image to begin analysis</p>
+            </div>
+        </div>
+
+        <!-- Footer -->
+        <div class="footer">
+            <p>🏥 Pneumonia Detection System | Powered by AI & Deep Learning</p>
+
+            <p style="margin-top: 8px; font-size: 12px;">
+                ResNet50 Transfer Learning Model | Accuracy: ~95% | ROC-AUC: ~99%
+            </p>
+        </div>
+    </div>
+
+    <!-- External JavaScript -->
+    <script src="{{ url_for('static', filename='js/app.js') }}"></script>
+</body>
+</html>
