@@ -20,6 +20,7 @@ from werkzeug.utils import secure_filename
 # Initialize Flask app
 app = Flask(__name__)
 CORS(app)  # Enable Cross-Origin Resource Sharing for cloud deployment
+app.config['SECRET_KEY'] = os.environ.get('SECRET_KEY', 'pneumonia-detection-secret-key-2026')
 app.config['MAX_CONTENT_LENGTH'] = 16 * 1024 * 1024  # 16MB max file size
 app.config['UPLOAD_FOLDER'] = 'uploads'
 
@@ -34,7 +35,7 @@ class Config:
     DEVICE = torch.device("cuda" if torch.cuda.is_available() else "cpu")
     IMG_SIZE = (224, 224)
     CLASSES = ["NORMAL", "PNEUMONIA"]
-    MODEL_PATH = "best_pneumonia_model.pth"
+    MODEL_PATH = os.environ.get("MODEL_PATH", "best_pneumonia_model.pth")
 
 # ============================================================================
 # Model Architecture

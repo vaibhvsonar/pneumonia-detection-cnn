@@ -45,7 +45,12 @@ git push -u origin main
    - **Build Command**: `pip install -r requirements.txt`
    - **Start Command**: `gunicorn --workers=1 --threads=2 --timeout=120 app:app`
    - **Instance Type**: **Free**
-6. Click **Deploy Web Service** at the bottom.
+6. Under **Environment Variables**, add these (recommended):
+   - `PYTHON_VERSION` = `3.11.9`
+   - `FLASK_ENV` = `production`
+   - `OMP_NUM_THREADS` = `1`
+   - `MKL_NUM_THREADS` = `1`
+7. Click **Deploy Web Service** at the bottom.
 
 Render will install dependencies, load the ResNet50 model, and give you a live HTTPS URL:
 `https://pneumonia-detection-xxxx.onrender.com`
