@@ -28,6 +28,57 @@ app.config['UPLOAD_FOLDER'] = 'uploads'
 os.makedirs(app.config['UPLOAD_FOLDER'], exist_ok=True)
 
 # ============================================================================
+# Cloud Deployment Port Bridge (Solves Render Port 5000 vs 10000 scan mismatch)
+# ============================================================================
+import socket
+import threading
+
+def _start_port_bridge(src_port=5000, dst_port=10000):
+    def handle_conn(client_sock):
+        try:
+            target_sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+            target_sock.connect(("127.0.0.1", dst_port))
+            def forward(src, dst):
+                try:
+                    while True:
+                        buf = src.recv(4096)
+                        if not buf:
+                            break
+                        dst.sendall(buf)
+                except Exception:
+                    pass
+                finally:
+                    try:
+                        dst.shutdown(socket.SHUT_WR)
+                    except Exception:
+                        pass
+            threading.Thread(target=forward, args=(client_sock, target_sock), daemon=True).start()
+            threading.Thread(target=forward, args=(target_sock, client_sock), daemon=True).start()
+        except Exception:
+            try:
+                client_sock.close()
+            except Exception:
+                pass
+
+    def listen_loop():
+        try:
+            srv = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+            srv.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
+            srv.bind(("0.0.0.0", src_port))
+            srv.listen(128)
+            print(f"✓ Port bridge active on 0.0.0.0:{src_port} -> 127.0.0.1:{dst_port}")
+            while True:
+                client, _ = srv.accept()
+                threading.Thread(target=handle_conn, args=(client,), daemon=True).start()
+        except Exception:
+            pass
+
+    threading.Thread(target=listen_loop, daemon=True).start()
+
+# Automatically bridge port 5000 -> 10000 so Render port scan succeeds instantly
+_start_port_bridge(src_port=5000, dst_port=10000)
+
+# ============================================================================
 # Model Configuration
 # ============================================================================
 
