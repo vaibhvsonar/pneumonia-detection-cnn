@@ -46,7 +46,12 @@ class PneumoniaDetectionModel(nn.Module):
     
     def __init__(self, pretrained=True):
         super(PneumoniaDetectionModel, self).__init__()
-        resnet50 = models.resnet50(pretrained=pretrained)
+        try:
+            from torchvision.models import ResNet50_Weights
+            weights = ResNet50_Weights.DEFAULT if pretrained else None
+            resnet50 = models.resnet50(weights=weights)
+        except Exception:
+            resnet50 = models.resnet50(pretrained=pretrained)
         
         self.conv1 = nn.Conv2d(1, 64, kernel_size=7, stride=2, padding=3, bias=False)
         self.bn1 = resnet50.bn1
@@ -97,18 +102,23 @@ device = Config.DEVICE
 model_loaded = False
 
 def load_model():
-    """Load the trained model."""
+    """Load the trained model with memory optimization for cloud hosting."""
     global model, model_loaded
     
     if model_loaded:
         return True
     
     try:
+        import gc
+        torch.set_num_threads(1)  # Keep PyTorch single-threaded to minimize memory
         model = PneumoniaDetectionModel(pretrained=False).to(device)
         
         # Try to load weights if they exist
         if os.path.exists(Config.MODEL_PATH):
-            model.load_state_dict(torch.load(Config.MODEL_PATH, map_location=device))
+            state_dict = torch.load(Config.MODEL_PATH, map_location=device)
+            model.load_state_dict(state_dict)
+            del state_dict  # Immediately release raw weights dictionary from RAM
+            gc.collect()    # Force garbage collection to free memory
             model_loaded = True
             model.eval()
             print(f"✓ Model loaded successfully from {Config.MODEL_PATH}")

@@ -43,7 +43,7 @@ git push -u origin main
    - **Root Directory**: *(leave blank)*
    - **Runtime**: `Python 3`
    - **Build Command**: `pip install -r requirements.txt`
-   - **Start Command**: `gunicorn --workers=1 --threads=2 --timeout=120 app:app`
+   - **Start Command**: `gunicorn --bind 0.0.0.0:$PORT --workers 1 --threads 2 --timeout 120 app:app`
    - **Instance Type**: **Free**
 6. Under **Environment Variables**, add these (recommended):
    - `PYTHON_VERSION` = `3.11.9`
