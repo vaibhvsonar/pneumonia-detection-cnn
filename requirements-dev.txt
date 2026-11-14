@@ -19,3 +19,4 @@ tqdm>=4.62.0
 jupyter>=1.0.0
 ipykernel>=6.0.0
 tensorboard>=2.8.0
+
