@@ -125,9 +125,15 @@ function makePrediction(file) {
         method: 'POST',
         body: formData
     })
-        .then(response => response.json())
-        .then(data => {
+        .then(async response => {
             loadingSpinner.classList.remove('show');
+            const text = await response.text();
+            let data;
+            try {
+                data = JSON.parse(text);
+            } catch (e) {
+                throw new Error(response.status ? `Server error (HTTP ${response.status})` : 'Invalid server response');
+            }
 
             if (data.success) {
                 displayResults(data);
